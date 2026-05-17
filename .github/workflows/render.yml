@@ -1,0 +1,124 @@
+name: Render Video
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'work-*/**'
+  workflow_dispatch:
+    inputs:
+      work_dir:
+        description: "work 目录名（如 work-2026-05-16-233301-topic）"
+        required: true
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.detect.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - id: detect
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            DIRS=$(printf '%s\n' "${{ inputs.work_dir }}" | jq -R . | jq -sc .)
+          else
+            BEFORE="${{ github.event.before }}"
+            AFTER="${{ github.sha }}"
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              DIRS=$(ls -d work-*/ 2>/dev/null | sed 's:/$::' | jq -R . | jq -sc . || echo '[]')
+            else
+              DIRS=$(git diff --name-only "$BEFORE" "$AFTER" \
+                | grep -E '^work-[^/]+/' \
+                | cut -d/ -f1 \
+                | sort -u \
+                | jq -R . \
+                | jq -sc . || echo '[]')
+            fi
+          fi
+          echo "Detected dirs: $DIRS"
+          echo "dirs=$DIRS" >> "$GITHUB_OUTPUT"
+
+  render:
+    needs: detect
+    if: needs.detect.outputs.dirs != '[]' && needs.detect.outputs.dirs != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        work_dir: ${{ fromJson(needs.detect.outputs.dirs) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install system deps (chromium, ffmpeg, fonts)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            chromium-browser \
+            ffmpeg \
+            fonts-noto-cjk \
+            fonts-noto-color-emoji
+
+      - name: Sanity-check work dir
+        run: |
+          test -d "${{ matrix.work_dir }}/composition" || { echo "missing composition/ in ${{ matrix.work_dir }}"; exit 1; }
+          test -f "${{ matrix.work_dir }}/.hyperframes-workdir" || { echo "missing .hyperframes-workdir marker"; exit 1; }
+          test -f "${{ matrix.work_dir }}/composition/index.html" || { echo "missing composition/index.html"; exit 1; }
+
+      - name: Install composition deps
+        working-directory: ${{ matrix.work_dir }}/composition
+        run: npm install --no-audit --no-fund
+
+      - name: Extract topic from marker
+        id: meta
+        run: |
+          TOPIC=$(node -e "const m=JSON.parse(require('fs').readFileSync('${{ matrix.work_dir }}/.hyperframes-workdir','utf8')); process.stdout.write(m.topic||'')")
+          if [ -z "$TOPIC" ]; then
+            echo "topic missing in marker"; exit 1
+          fi
+          echo "topic=$TOPIC" >> "$GITHUB_OUTPUT"
+
+      - name: Render
+        working-directory: ${{ matrix.work_dir }}/composition
+        run: |
+          mkdir -p ../artifacts
+          npx --yes hyperframes render --output "../artifacts/${{ steps.meta.outputs.topic }}-final.mp4"
+          ls -lh ../artifacts/
+
+      - name: Upload to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp \
+            "${{ matrix.work_dir }}/artifacts/${{ steps.meta.outputs.topic }}-final.mp4" \
+            "s3://${{ secrets.CF_R2_BUCKET }}/videos/${{ matrix.work_dir }}/${{ steps.meta.outputs.topic }}-final.mp4" \
+            --endpoint-url "https://${{ secrets.CF_R2_ACCOUNT_ID }}.r2.cloudflarestorage.com" \
+            --region auto
+          {
+            echo "### Render Done"
+            echo ""
+            echo "- Work dir: \`${{ matrix.work_dir }}\`"
+            echo "- Topic: \`${{ steps.meta.outputs.topic }}\`"
+            echo "- R2 path: \`videos/${{ matrix.work_dir }}/${{ steps.meta.outputs.topic }}-final.mp4\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload render log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-log-${{ matrix.work_dir }}
+          path: |
+            ${{ matrix.work_dir }}/composition/renders/
+            ${{ matrix.work_dir }}/logs/
+          if-no-files-found: ignore
+          retention-days: 7
