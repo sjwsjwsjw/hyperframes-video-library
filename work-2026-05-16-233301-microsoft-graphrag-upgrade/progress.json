@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "workflow": "video-pipeline",
+  "topic": "microsoft-graphrag-upgrade",
+  "workDir": "/Users/zlf/IdeaProjects/video-gen-hyperframes/output/work-2026-05-16-233301-microsoft-graphrag-upgrade",
+  "status": "running",
+  "currentStage": "validation",
+  "createdAt": "2026-05-16T15:33:06.589Z",
+  "updatedAt": "2026-05-16T16:22:50.898Z",
+  "stages": {
+    "spec": {
+      "status": "done",
+      "updatedAt": "2026-05-16T15:33:06.589Z",
+      "finishedAt": "2026-05-16T15:33:06.589Z",
+      "outputs": [
+        "spec.md"
+      ]
+    },
+    "timing": {
+      "dependsOn": [
+        "narration"
+      ],
+      "impactScope": [
+        "all-scenes"
+      ],
+      "rerunReason": "tts timing capture",
+      "status": "done",
+      "updatedAt": "2026-05-16T15:34:51.040Z",
+      "startedAt": "2026-05-16T15:34:41.647Z",
+      "inputSignature": "tts-vtt:94.248:zh-CN-YunjianNeural:+20%:+50%:+13Hz",
+      "finishedAt": "2026-05-16T15:34:51.040Z",
+      "outputs": [
+        "timing.json",
+        "artifacts/2026-05-16-233301-microsoft-graphrag-upgrade-voice.mp3"
+      ]
+    },
+    "composition": {
+      "dependsOn": [
+        "timing"
+      ],
+      "impactScope": [
+        "all-scenes"
+      ],
+      "rerunReason": "new timing requires composition refresh",
+      "status": "stale",
+      "updatedAt": "2026-05-16T15:34:51.046Z",
+      "finishedAt": "2026-05-16T15:34:51.046Z"
+    },
+    "validation": {
+      "dependsOn": [
+        "timing"
+      ],
+      "impactScope": [
+        "all-scenes"
+      ],
+      "rerunReason": "new timing requires composition refresh",
+      "status": "stale",
+      "updatedAt": "2026-05-16T15:34:51.048Z",
+      "finishedAt": "2026-05-16T15:34:51.048Z"
+    },
+    "render": {
+      "status": "done",
+      "updatedAt": "2026-05-16T16:22:50.898Z",
+      "finishedAt": "2026-05-16T16:22:50.898Z",
+      "outputs": [
+        "artifacts/microsoft-graphrag-upgrade-final.mp4"
+      ]
+    }
+  },
+  "lastError": null
+}

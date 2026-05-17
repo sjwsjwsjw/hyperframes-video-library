@@ -1,0 +1,6 @@
+{"ts":"2026-05-16T15:33:06.592Z","event":"stage.done","workflow":"video-pipeline","topic":"microsoft-graphrag-upgrade","stage":"spec","outputs":["spec.md"]}
+{"ts":"2026-05-16T15:34:41.650Z","event":"stage.running","workflow":"video-pipeline","topic":"microsoft-graphrag-upgrade","stage":"timing"}
+{"ts":"2026-05-16T15:34:51.044Z","event":"stage.done","workflow":"video-pipeline","topic":"microsoft-graphrag-upgrade","stage":"timing","outputs":["timing.json","artifacts/2026-05-16-233301-microsoft-graphrag-upgrade-voice.mp3"]}
+{"ts":"2026-05-16T15:34:51.047Z","event":"stage.stale","workflow":"video-pipeline","topic":"microsoft-graphrag-upgrade","stage":"composition"}
+{"ts":"2026-05-16T15:34:51.050Z","event":"stage.stale","workflow":"video-pipeline","topic":"microsoft-graphrag-upgrade","stage":"validation"}
+{"ts":"2026-05-16T16:22:50.904Z","event":"stage.done","workflow":"video-pipeline","topic":"microsoft-graphrag-upgrade","stage":"render","outputs":["artifacts/microsoft-graphrag-upgrade-final.mp4"]}

@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0a0e1a;
+        font-family: 'Space Grotesk', sans-serif;
+      }
+      .scene {
+        position: absolute;
+        top: 0; left: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0a0e1a;
+      }
+      .hl-blue { color: #00d4ff; font-weight: 700; }
+      .hl-red { color: #ff3b5c; font-weight: 700; }
+      .hl-green { color: #00ff88; font-weight: 700; }
+      .hl-yellow { color: #ffd700; font-weight: 700; }
+      .card {
+        background: rgba(30, 144, 255, 0.08);
+        border: 2px solid rgba(0, 212, 255, 0.25);
+        border-radius: 16px;
+        padding: 36px 44px;
+      }
+      .card-red {
+        background: rgba(255, 59, 92, 0.08);
+        border: 2px solid rgba(255, 59, 92, 0.3);
+        border-radius: 16px;
+        padding: 36px 44px;
+      }
+      .card-green {
+        background: rgba(0, 255, 136, 0.06);
+        border: 2px solid rgba(0, 255, 136, 0.3);
+        border-radius: 16px;
+        padding: 36px 44px;
+      }
+      .divider {
+        height: 3px;
+        background: linear-gradient(90deg, #00d4ff, transparent);
+        transform-origin: left center;
+        border-radius: 2px;
+      }
+      .divider-red {
+        height: 3px;
+        background: linear-gradient(90deg, #ff3b5c, transparent);
+        transform-origin: left center;
+        border-radius: 2px;
+      }
+      .tag {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 400;
+        color: #8899aa;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 8px 16px;
+        border: 1px solid rgba(136, 153, 170, 0.3);
+        border-radius: 6px;
+      }
+      .tag-blue {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 400;
+        color: #00d4ff;
+        letter-spacing: 0.08em;
+        padding: 8px 16px;
+        border: 1px solid rgba(0, 212, 255, 0.4);
+        border-radius: 6px;
+      }
+      .node-dot {
+        width: 14px; height: 14px;
+        border-radius: 50%;
+        background: #00d4ff;
+        box-shadow: 0 0 16px #00d4ff;
+        display: inline-block;
+        flex-shrink: 0;
+        margin-top: 6px;
+      }
+      .node-dot-red {
+        width: 14px; height: 14px;
+        border-radius: 50%;
+        background: #ff3b5c;
+        box-shadow: 0 0 16px #ff3b5c;
+        display: inline-block;
+        flex-shrink: 0;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="97.248"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- AUDIO: starts at 3s (after cover) -->
+      <audio
+        id="voice"
+        class="clip"
+        data-start="3"
+        data-duration="94.248"
+        data-track-index="0"
+        data-volume="1"
+        src="assets/2026-05-16-233301-microsoft-graphrag-upgrade-voice.mp3"
+      ></audio>
+
+      <!-- ============================================================ -->
+      <!-- SCENE COVER: 0-3s — 封面 -->
+      <!-- ============================================================ -->
+      <div id="sc0" class="scene clip" data-start="0" data-duration="3" data-track-index="1" style="z-index:1;">
+        <!-- BG radial glow -->
+        <div id="sc0-glow1" style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.18) 0%,transparent 70%);top:-200px;left:140px;"></div>
+        <div id="sc0-glow2" style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.12) 0%,transparent 70%);bottom:200px;right:-100px;"></div>
+        <!-- BG graph lines (SVG) -->
+        <svg id="sc0-graph" style="position:absolute;top:0;left:0;width:1080px;height:1920px;opacity:0.1;" viewBox="0 0 1080 1920">
+          <line x1="200" y1="400" x2="540" y2="700" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="540" y1="700" x2="880" y2="500" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="540" y1="700" x2="400" y2="1100" stroke="#1e90ff" stroke-width="1.5"/>
+          <line x1="400" y1="1100" x2="700" y2="1300" stroke="#1e90ff" stroke-width="1.5"/>
+          <line x1="880" y1="500" x2="700" y2="1300" stroke="#00d4ff" stroke-width="1"/>
+          <circle cx="200" cy="400" r="8" fill="#00d4ff" opacity="0.6"/>
+          <circle cx="540" cy="700" r="12" fill="#00d4ff" opacity="0.8"/>
+          <circle cx="880" cy="500" r="8" fill="#1e90ff" opacity="0.6"/>
+          <circle cx="400" cy="1100" r="8" fill="#1e90ff" opacity="0.6"/>
+          <circle cx="700" cy="1300" r="8" fill="#00d4ff" opacity="0.6"/>
+        </svg>
+        <!-- Microsoft 4-color mark (top-left) -->
+        <div id="sc0-ms" style="position:absolute;top:80px;left:108px;display:grid;grid-template-columns:18px 18px;grid-template-rows:18px 18px;gap:4px;">
+          <div style="background:#f25022;border-radius:2px;"></div>
+          <div style="background:#7fba00;border-radius:2px;"></div>
+          <div style="background:#00a4ef;border-radius:2px;"></div>
+          <div style="background:#ffb900;border-radius:2px;"></div>
+        </div>
+        <!-- Top tag -->
+        <div id="sc0-tag" style="position:absolute;top:72px;left:160px;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;">MICROSOFT · GRAPHRAG</div>
+        <!-- Main content -->
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;align-items:center;padding:192px 108px;">
+          <div></div>
+          <div>
+            <div id="sc0-eyebrow" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#00d4ff;letter-spacing:0.12em;margin-bottom:32px;">RAG → GRAPHRAG</div>
+            <div id="sc0-title1" style="font-size:96px;font-weight:900;color:#ffffff;line-height:1.05;letter-spacing:-0.03em;margin-bottom:16px;">微软悄悄</div>
+            <div id="sc0-title2" style="font-size:96px;font-weight:900;color:#ffffff;line-height:1.05;letter-spacing:-0.03em;margin-bottom:16px;">升级了</div>
+            <div id="sc0-title3" style="font-size:96px;font-weight:900;color:#00d4ff;line-height:1.05;letter-spacing:-0.03em;margin-bottom:48px;">RAG</div>
+            <div id="sc0-divider" class="divider" style="width:100%;margin-bottom:40px;"></div>
+            <div id="sc0-sub" style="font-size:48px;font-weight:400;color:#8899aa;line-height:1.4;">99%的人还不知道</div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Bottom bar -->
+        <div id="sc0-bar" style="position:absolute;bottom:80px;left:108px;right:108px;height:3px;background:linear-gradient(90deg,#00d4ff,#1e90ff,transparent);border-radius:2px;transform-origin:left;"></div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 1: 3.1-6.175s — 现在很多人做AI应用，上来就用RAG -->
+      <!-- ============================================================ -->
+      <div id="sc1" class="scene clip" data-start="3.1" data-duration="3.024" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 70%);top:-100px;right:-100px;"></div>
+        <div id="sc1-glow" style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(30,144,255,0.12) 0%,transparent 70%);bottom:300px;left:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc1-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 现状</div>
+          <div>
+            <div id="sc1-num" style="font-family:'JetBrains Mono',monospace;font-size:28px;color:#1e90ff;margin-bottom:24px;letter-spacing:0.1em;">01 / 29</div>
+            <div id="sc1-text" style="font-size:64px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">现在很多人做<span class="hl-blue">AI应用</span>，上来就用<span class="hl-blue">RAG</span>。</div>
+            <div id="sc1-divider" class="divider" style="width:80%;margin-top:40px;"></div>
+          </div>
+          <div id="sc1-bottom" style="align-self:end;padding-bottom:20px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;">微软 GraphRAG 升级解析</div>
+          </div>
+        </div>
+        <!-- Decorative: floating RAG label -->
+        <div id="sc1-deco" style="position:absolute;top:300px;right:80px;font-family:'JetBrains Mono',monospace;font-size:80px;font-weight:900;color:rgba(0,212,255,0.06);letter-spacing:-0.02em;transform:rotate(-15deg);">RAG</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 2: 6.125-9.552s — 我直接说——大部分人用的方式，都是错的 -->
+      <!-- ============================================================ -->
+      <div id="sc2" class="scene clip" data-start="6.125" data-duration="3.427" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.15) 0%,transparent 70%);top:-300px;left:-200px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc2-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;letter-spacing:0.08em;padding-top:20px;">// 直接说</div>
+          <div>
+            <div id="sc2-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#ff3b5c;letter-spacing:0.1em;margin-bottom:28px;">⚠ WARNING</div>
+            <div id="sc2-text" style="font-size:72px;font-weight:900;color:#ffffff;line-height:1.2;letter-spacing:-0.02em;">大部分人用的方式，</div>
+            <div id="sc2-text2" style="font-size:88px;font-weight:900;color:#ff3b5c;line-height:1.1;letter-spacing:-0.03em;margin-top:8px;">都是错的。</div>
+            <div id="sc2-divider" class="divider-red" style="width:100%;margin-top:44px;"></div>
+            <div id="sc2-sub" style="font-size:32px;color:#8899aa;margin-top:28px;font-family:'JetBrains Mono',monospace;">我直接说——</div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Decorative: big X -->
+        <div id="sc2-deco" style="position:absolute;bottom:200px;right:60px;font-size:200px;font-weight:900;color:rgba(255,59,92,0.06);line-height:1;">✕</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 3: 9.552-11.208s — 你有没有遇到过 -->
+      <!-- ============================================================ -->
+      <div id="sc3" class="scene clip" data-start="9.552" data-duration="1.656" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 70%);top:400px;left:200px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc3-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 痛点</div>
+          <div>
+            <div id="sc3-text" style="font-size:80px;font-weight:700;color:#ffffff;line-height:1.3;letter-spacing:-0.02em;">你有没有<br><span class="hl-blue">遇到过</span>：</div>
+            <div id="sc3-divider" class="divider" style="width:60%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <div id="sc3-deco" style="position:absolute;top:200px;right:80px;font-size:160px;color:rgba(0,212,255,0.05);font-weight:900;">?</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 4: 11.208-14.968s — 文件明明给AI看了，它的回答还是答非所问 -->
+      <!-- ============================================================ -->
+      <div id="sc4" class="scene clip" data-start="11.208" data-duration="3.76" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.12) 0%,transparent 70%);bottom:200px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc4-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;letter-spacing:0.08em;padding-top:20px;">// 痛点 01</div>
+          <div>
+            <!-- Chat bubble style -->
+            <div id="sc4-bubble-q" class="card" style="margin-bottom:24px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;margin-bottom:12px;">用户问题</div>
+              <div style="font-size:40px;color:#ffffff;line-height:1.5;">文件明明给AI看了...</div>
+            </div>
+            <div id="sc4-bubble-a" class="card-red">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;margin-bottom:12px;">AI 回答</div>
+              <div style="font-size:48px;font-weight:700;color:#ff3b5c;line-height:1.3;">答非所问 ✕</div>
+            </div>
+            <div id="sc4-divider" class="divider-red" style="width:100%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Decorative image: AI robot -->
+        <div id="sc4-img-wrap" style="position:absolute;bottom:180px;right:60px;width:280px;height:280px;border-radius:16px;overflow:hidden;opacity:0.35;">
+          <img src="assets/media/pixabay-7720802.jpg" style="width:100%;height:100%;object-fit:cover;" data-layout-ignore/>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 5: 15.041-18.114s — 问它复杂一点的问题，它开始胡说八道 -->
+      <!-- ============================================================ -->
+      <div id="sc5" class="scene clip" data-start="15.041" data-duration="2.999" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.14) 0%,transparent 70%);top:-100px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc5-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;letter-spacing:0.08em;padding-top:20px;">// 痛点 02</div>
+          <div>
+            <div id="sc5-bubble-q" class="card" style="margin-bottom:24px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;margin-bottom:12px;">复杂问题</div>
+              <div style="font-size:40px;color:#ffffff;line-height:1.5;">问它复杂一点的问题...</div>
+            </div>
+            <div id="sc5-bubble-a" class="card-red">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;margin-bottom:12px;">AI 回答</div>
+              <div style="font-size:48px;font-weight:700;color:#ff3b5c;line-height:1.3;">开始胡说八道 ✕</div>
+            </div>
+            <div id="sc5-divider" class="divider-red" style="width:100%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <div id="sc5-deco" style="position:absolute;bottom:200px;left:60px;font-size:120px;color:rgba(255,59,92,0.06);font-weight:900;">ERROR</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 6: 18.041-19.916s — 你以为是模型不够好 -->
+      <!-- ============================================================ -->
+      <div id="sc6" class="scene clip" data-start="18.041" data-duration="1.875" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,0.1) 0%,transparent 70%);top:500px;left:200px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc6-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ffd700;letter-spacing:0.08em;padding-top:20px;">// 误判</div>
+          <div>
+            <div id="sc6-text" style="font-size:72px;font-weight:700;color:#ffffff;line-height:1.3;letter-spacing:-0.02em;">你以为是<br><span class="hl-yellow">模型不够好</span>——</div>
+            <div id="sc6-divider" style="height:3px;background:linear-gradient(90deg,#ffd700,transparent);margin-top:40px;transform-origin:left;border-radius:2px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <div id="sc6-deco" style="position:absolute;top:200px;right:60px;font-size:140px;color:rgba(255,215,0,0.05);font-weight:900;">?</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 7: 19.916-24.114s — 其实是你用的检索方式，根本就没让AI真正理解文件 -->
+      <!-- ============================================================ -->
+      <div id="sc7" class="scene clip" data-start="19.916" data-duration="4.198" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 70%);bottom:-200px;left:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc7-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 真相</div>
+          <div>
+            <div id="sc7-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#00d4ff;letter-spacing:0.1em;margin-bottom:28px;">ROOT CAUSE</div>
+            <div id="sc7-text" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">其实是你用的<span class="hl-red">检索方式</span>，</div>
+            <div id="sc7-text2" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;margin-top:8px;">根本就没让AI</div>
+            <div id="sc7-text3" style="font-size:60px;font-weight:700;color:#00d4ff;line-height:1.4;letter-spacing:-0.01em;margin-top:8px;">真正理解文件。</div>
+            <div id="sc7-divider" class="divider" style="width:100%;margin-top:44px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 8: 24.114-26.26s — 传统RAG是这么工作的 -->
+      <!-- ============================================================ -->
+      <div id="sc8" class="scene clip" data-start="24.114" data-duration="2.146" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(30,144,255,0.12) 0%,transparent 70%);top:300px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc8-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 传统 RAG</div>
+          <div>
+            <div id="sc8-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#1e90ff;letter-spacing:0.1em;margin-bottom:28px;">HOW IT WORKS</div>
+            <div id="sc8-text" style="font-size:80px;font-weight:700;color:#ffffff;line-height:1.3;letter-spacing:-0.02em;">传统<span class="hl-blue">RAG</span><br>是这么工作的：</div>
+            <div id="sc8-divider" class="divider" style="width:70%;margin-top:44px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <div id="sc8-deco" style="position:absolute;bottom:200px;right:60px;font-size:160px;color:rgba(30,144,255,0.05);font-weight:900;font-family:'JetBrains Mono',monospace;">RAG</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 9: 26.26-31.197s — 你问问题，它去文件里搜关键词... -->
+      <!-- ============================================================ -->
+      <div id="sc9" class="scene clip" data-start="26.26" data-duration="4.936" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(30,144,255,0.1) 0%,transparent 70%);top:-100px;left:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc9-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 工作流程</div>
+          <div>
+            <!-- Step flow -->
+            <div id="sc9-step1" style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#1e90ff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;margin-top:4px;">1</div>
+              <div style="font-size:44px;color:#ffffff;line-height:1.4;">你问问题</div>
+            </div>
+            <div id="sc9-step2" style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#1e90ff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;margin-top:4px;">2</div>
+              <div style="font-size:44px;color:#ffffff;line-height:1.4;">它去文件里<span class="hl-blue">搜关键词</span></div>
+            </div>
+            <div id="sc9-step3" style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#1e90ff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;margin-top:4px;">3</div>
+              <div style="font-size:44px;color:#ffffff;line-height:1.4;">找几段相关文字</div>
+            </div>
+            <div id="sc9-step4" style="display:flex;align-items:flex-start;gap:20px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#1e90ff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;margin-top:4px;">4</div>
+              <div style="font-size:44px;color:#ffffff;line-height:1.4;">扔给 AI</div>
+            </div>
+            <div id="sc9-divider" class="divider" style="width:100%;margin-top:44px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 10: 31.197-32.822s — 听起来没问题对吧？ -->
+      <!-- ============================================================ -->
+      <div id="sc10" class="scene clip" data-start="31.197" data-duration="1.625" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 70%);top:500px;right:100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc10-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 表面看</div>
+          <div>
+            <div id="sc10-text" style="font-size:80px;font-weight:700;color:#ffffff;line-height:1.3;letter-spacing:-0.02em;">听起来<br>没问题<span class="hl-blue">对吧？</span></div>
+            <div id="sc10-divider" class="divider" style="width:60%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <div id="sc10-deco" style="position:absolute;bottom:300px;right:60px;font-size:120px;color:rgba(0,212,255,0.05);font-weight:900;">✓</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 11: 32.822-36.291s — 问题就在这——它找到的是"片段"，不是"关系" -->
+      <!-- ============================================================ -->
+      <div id="sc11" class="scene clip" data-start="32.822" data-duration="3.468" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.15) 0%,transparent 70%);top:-200px;right:-200px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc11-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;letter-spacing:0.08em;padding-top:20px;">// 核心缺陷</div>
+          <div>
+            <div id="sc11-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#ff3b5c;letter-spacing:0.1em;margin-bottom:28px;">CORE FLAW</div>
+            <div id="sc11-text" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">问题就在这——</div>
+            <div id="sc11-compare" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:32px;">
+              <div id="sc11-bad" class="card-red" style="text-align:center;">
+                <div style="font-size:36px;font-weight:700;color:#ff3b5c;margin-bottom:8px;">片段</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:#8899aa;">找到的</div>
+              </div>
+              <div id="sc11-good" class="card" style="text-align:center;opacity:0.4;">
+                <div style="font-size:36px;font-weight:700;color:#00d4ff;margin-bottom:8px;">关系</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:#8899aa;">缺失的</div>
+              </div>
+            </div>
+            <div id="sc11-divider" class="divider-red" style="width:100%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Broken glass image -->
+        <div id="sc11-img-wrap" style="position:absolute;bottom:160px;right:60px;width:260px;height:260px;border-radius:16px;overflow:hidden;opacity:0.25;">
+          <img src="assets/media/pixabay-1818066.jpg" style="width:100%;height:100%;object-fit:cover;" data-layout-ignore/>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 12: 36.291-40.406s — 就像你想了解一个人，有人给你看了他朋友圈的几条截图 -->
+      <!-- ============================================================ -->
+      <div id="sc12" class="scene clip" data-start="36.291" data-duration="4.115" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(30,144,255,0.1) 0%,transparent 70%);bottom:100px;left:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc12-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 比喻</div>
+          <div>
+            <div id="sc12-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#1e90ff;letter-spacing:0.1em;margin-bottom:28px;">ANALOGY</div>
+            <div id="sc12-text" style="font-size:52px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;">就像你想了解一个人，</div>
+            <div id="sc12-text2" style="font-size:52px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;margin-top:8px;">有人给你看了他</div>
+            <div id="sc12-text3" style="font-size:52px;font-weight:700;color:#00d4ff;line-height:1.5;letter-spacing:-0.01em;margin-top:8px;">朋友圈的几条截图。</div>
+            <div id="sc12-divider" class="divider" style="width:100%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Decorative: screenshot frames -->
+        <div id="sc12-frames" style="position:absolute;bottom:160px;right:60px;display:flex;flex-direction:column;gap:12px;opacity:0.3;">
+          <div style="width:200px;height:60px;border:2px solid #1e90ff;border-radius:8px;background:rgba(30,144,255,0.1);"></div>
+          <div style="width:200px;height:60px;border:2px solid #1e90ff;border-radius:8px;background:rgba(30,144,255,0.1);"></div>
+          <div style="width:200px;height:60px;border:2px solid #1e90ff;border-radius:8px;background:rgba(30,144,255,0.1);"></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 13: 40.406-41.864s — 你能了解他吗？ -->
+      <!-- ============================================================ -->
+      <div id="sc13" class="scene clip" data-start="40.406" data-duration="1.458" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.1) 0%,transparent 70%);top:400px;right:100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc13-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 反问</div>
+          <div>
+            <div id="sc13-text" style="font-size:88px;font-weight:700;color:#ffffff;line-height:1.2;letter-spacing:-0.02em;">你能了解<br><span class="hl-red">他吗？</span></div>
+          </div>
+          <div></div>
+        </div>
+        <div id="sc13-deco" style="position:absolute;bottom:200px;left:60px;font-size:160px;color:rgba(255,59,92,0.05);font-weight:900;">?</div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 14: 41.864-42.76s — 不能。 -->
+      <!-- ============================================================ -->
+      <div id="sc14" class="scene clip" data-start="41.864" data-duration="0.896" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.2) 0%,transparent 70%);top:400px;left:140px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:flex;align-items:center;justify-content:center;padding:192px 108px;">
+          <div id="sc14-text" style="font-size:160px;font-weight:900;color:#ff3b5c;letter-spacing:-0.04em;text-align:center;line-height:1;">不能。</div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 15: 42.76-46.197s — 因为你不知道这几条截图背后，发生了什么 -->
+      <!-- ============================================================ -->
+      <div id="sc15" class="scene clip" data-start="42.76" data-duration="3.437" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(30,144,255,0.12) 0%,transparent 70%);bottom:100px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc15-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 原因</div>
+          <div>
+            <div id="sc15-text" style="font-size:56px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;">因为你不知道</div>
+            <div id="sc15-text2" style="font-size:56px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;margin-top:8px;">这几条截图背后，</div>
+            <div id="sc15-text3" style="font-size:64px;font-weight:700;color:#00d4ff;line-height:1.4;letter-spacing:-0.02em;margin-top:8px;">发生了什么。</div>
+            <div id="sc15-divider" class="divider" style="width:100%;margin-top:44px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 16: 46.197-49.249s — 微软做的GraphRAG，解决的就是这个问题 -->
+      <!-- ============================================================ -->
+      <div id="sc16" class="scene clip" data-start="46.197" data-duration="3.052" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.2) 0%,transparent 70%);top:-200px;left:-100px;"></div>
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,0.1) 0%,transparent 70%);bottom:100px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc16-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 解决方案</div>
+          <div>
+            <div id="sc16-ms" style="display:flex;align-items:center;gap:16px;margin-bottom:32px;">
+              <div style="display:grid;grid-template-columns:14px 14px;grid-template-rows:14px 14px;gap:3px;">
+                <div style="background:#f25022;border-radius:1px;"></div>
+                <div style="background:#7fba00;border-radius:1px;"></div>
+                <div style="background:#00a4ef;border-radius:1px;"></div>
+                <div style="background:#ffb900;border-radius:1px;"></div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#8899aa;letter-spacing:0.08em;">Microsoft</div>
+            </div>
+            <div id="sc16-title" style="font-size:96px;font-weight:900;color:#00d4ff;line-height:1.0;letter-spacing:-0.03em;margin-bottom:16px;">Graph<br>RAG</div>
+            <div id="sc16-sub" style="font-size:48px;font-weight:600;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">解决的就是<br>这个问题。</div>
+            <div id="sc16-divider" style="height:3px;background:linear-gradient(90deg,#00d4ff,#00ff88,transparent);margin-top:44px;transform-origin:left;border-radius:2px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Microsoft Surface image -->
+        <div id="sc16-img-wrap" style="position:absolute;bottom:160px;right:60px;width:260px;height:260px;border-radius:16px;overflow:hidden;opacity:0.3;">
+          <img src="assets/media/pixabay-3671640.jpg" style="width:100%;height:100%;object-fit:cover;" data-layout-ignore/>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 17: 49.249-52.947s — 它读文件不是在找关键词，它在建一张关系网 -->
+      <!-- ============================================================ -->
+      <div id="sc17" class="scene clip" data-start="49.249" data-duration="3.698" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 70%);top:300px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc17-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 工作原理</div>
+          <div>
+            <div id="sc17-compare" style="display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:32px;">
+              <div id="sc17-old" class="card-red">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;margin-bottom:8px;">传统 RAG</div>
+                <div style="font-size:40px;color:#ffffff;">找<span class="hl-red">关键词</span></div>
+              </div>
+              <div id="sc17-new" class="card">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;margin-bottom:8px;">GraphRAG</div>
+                <div style="font-size:40px;color:#ffffff;">建<span class="hl-blue">关系网</span></div>
+              </div>
+            </div>
+            <div id="sc17-divider" class="divider" style="width:100%;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 18: 52.947-58.489s — 这个人影响了这个决策，这个决策导致了这个结果... -->
+      <!-- ============================================================ -->
+      <div id="sc18" class="scene clip" data-start="52.947" data-duration="5.541" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.18) 0%,transparent 70%);top:400px;left:140px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc18-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 知识图谱</div>
+          <div>
+            <!-- Knowledge graph visualization -->
+            <svg id="sc18-graph" viewBox="0 0 864 600" style="width:100%;height:auto;margin-bottom:32px;">
+              <!-- Nodes -->
+              <circle id="sc18-n1" cx="432" cy="80" r="40" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="2"/>
+              <text x="432" y="88" text-anchor="middle" fill="#00d4ff" font-size="24" font-family="Space Grotesk" font-weight="700">人物</text>
+              <circle id="sc18-n2" cx="200" cy="320" r="40" fill="rgba(30,144,255,0.15)" stroke="#1e90ff" stroke-width="2"/>
+              <text x="200" y="328" text-anchor="middle" fill="#1e90ff" font-size="24" font-family="Space Grotesk" font-weight="700">决策</text>
+              <circle id="sc18-n3" cx="664" cy="320" r="40" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="2"/>
+              <text x="664" y="328" text-anchor="middle" fill="#00ff88" font-size="24" font-family="Space Grotesk" font-weight="700">结果</text>
+              <!-- Edges -->
+              <line id="sc18-e1" x1="432" y1="120" x2="240" y2="280" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+              <line id="sc18-e2" x1="240" y1="320" x2="624" y2="320" stroke="#1e90ff" stroke-width="2" opacity="0.6"/>
+              <!-- Edge labels -->
+              <text x="300" y="220" fill="#8899aa" font-size="20" font-family="JetBrains Mono">影响</text>
+              <text x="400" y="310" fill="#8899aa" font-size="20" font-family="JetBrains Mono">导致</text>
+            </svg>
+            <div id="sc18-text" style="font-size:44px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;">全部建成<span class="hl-blue">图</span>，存起来。</div>
+            <div id="sc18-divider" class="divider" style="width:100%;margin-top:32px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Network image -->
+        <div id="sc18-img-wrap" style="position:absolute;bottom:140px;right:60px;width:240px;height:240px;border-radius:16px;overflow:hidden;opacity:0.2;">
+          <img src="assets/media/pixabay-3148727.jpg" style="width:100%;height:100%;object-fit:cover;" data-layout-ignore/>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 19: 58.489-61.479s — 你问问题的时候，它顺着关系网找答案 -->
+      <!-- ============================================================ -->
+      <div id="sc19" class="scene clip" data-start="58.489" data-duration="2.99" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,0.12) 0%,transparent 70%);top:300px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc19-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00ff88;letter-spacing:0.08em;padding-top:20px;">// 查询方式</div>
+          <div>
+            <div id="sc19-text" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">你问问题的时候，</div>
+            <div id="sc19-text2" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;margin-top:8px;">它顺着</div>
+            <div id="sc19-text3" style="font-size:72px;font-weight:900;color:#00d4ff;line-height:1.2;letter-spacing:-0.02em;margin-top:8px;">关系网</div>
+            <div id="sc19-text4" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;margin-top:8px;">找答案。</div>
+            <div id="sc19-divider" style="height:3px;background:linear-gradient(90deg,#00ff88,transparent);margin-top:44px;transform-origin:left;border-radius:2px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 20: 61.479-67.302s — 就像你不是在看朋友圈截图，而是认识了他所有的朋友... -->
+      <!-- ============================================================ -->
+      <div id="sc20" class="scene clip" data-start="61.479" data-duration="5.823" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 70%);bottom:-100px;left:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc20-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 对比</div>
+          <div>
+            <div id="sc20-old" class="card-red" style="margin-bottom:24px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;margin-bottom:12px;">传统 RAG</div>
+              <div style="font-size:40px;color:#ffffff;line-height:1.5;">看朋友圈截图</div>
+            </div>
+            <div id="sc20-new" class="card">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;margin-bottom:12px;">GraphRAG</div>
+              <div style="font-size:40px;color:#ffffff;line-height:1.5;">认识了他所有的朋友，了解了他的成长经历</div>
+            </div>
+            <div id="sc20-divider" class="divider" style="width:100%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 21: 67.302-70.656s — 这时候你对他的理解，是完全不同的层次 -->
+      <!-- ============================================================ -->
+      <div id="sc21" class="scene clip" data-start="67.302" data-duration="3.354" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,0.15) 0%,transparent 70%);top:300px;left:90px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc21-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00ff88;letter-spacing:0.08em;padding-top:20px;">// 升维</div>
+          <div>
+            <div id="sc21-text" style="font-size:60px;font-weight:700;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">这时候你对他的理解，</div>
+            <div id="sc21-text2" style="font-size:72px;font-weight:900;color:#00ff88;line-height:1.2;letter-spacing:-0.02em;margin-top:16px;">完全不同的层次。</div>
+            <div id="sc21-divider" style="height:3px;background:linear-gradient(90deg,#00ff88,transparent);margin-top:44px;transform-origin:left;border-radius:2px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 22: 70.656-74.406s — 有人会说：GraphRAG不是更慢更贵吗，没必要 -->
+      <!-- ============================================================ -->
+      <div id="sc22" class="scene clip" data-start="70.656" data-duration="3.75" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,0.12) 0%,transparent 70%);top:-100px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc22-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ffd700;letter-spacing:0.08em;padding-top:20px;">// 反驳声音</div>
+          <div>
+            <div id="sc22-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#ffd700;letter-spacing:0.1em;margin-bottom:28px;">OBJECTION</div>
+            <!-- Quote bubble -->
+            <div id="sc22-quote" style="background:rgba(255,215,0,0.06);border:2px solid rgba(255,215,0,0.25);border-radius:16px;padding:36px 44px;margin-bottom:24px;">
+              <div style="font-size:28px;color:#8899aa;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">有人会说：</div>
+              <div style="font-size:48px;font-weight:700;color:#ffd700;line-height:1.4;">GraphRAG不是<br>更慢更贵吗，<br>没必要。</div>
+            </div>
+            <div id="sc22-divider" style="height:3px;background:linear-gradient(90deg,#ffd700,transparent);transform-origin:left;border-radius:2px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 23: 74.406-77.239s — 我同意——简单场景确实没必要 -->
+      <!-- ============================================================ -->
+      <div id="sc23" class="scene clip" data-start="74.406" data-duration="2.833" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,0.1) 0%,transparent 70%);bottom:300px;left:100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc23-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00ff88;letter-spacing:0.08em;padding-top:20px;">// 承认</div>
+          <div>
+            <div id="sc23-text" style="font-size:72px;font-weight:700;color:#ffffff;line-height:1.3;letter-spacing:-0.02em;">我同意——</div>
+            <div id="sc23-text2" style="font-size:60px;font-weight:600;color:#00ff88;line-height:1.4;letter-spacing:-0.01em;margin-top:16px;">简单场景<br>确实没必要。</div>
+            <div id="sc23-divider" style="height:3px;background:linear-gradient(90deg,#00ff88,transparent);margin-top:44px;transform-origin:left;border-radius:2px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 24: 77.239-81.77s — 但如果你在做企业知识库、复杂文档分析，还在用传统RAG -->
+      <!-- ============================================================ -->
+      <div id="sc24" class="scene clip" data-start="77.239" data-duration="4.530" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.15) 0%,transparent 70%);top:-200px;left:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc24-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;letter-spacing:0.08em;padding-top:20px;">// 但是</div>
+          <div>
+            <div id="sc24-text" style="font-size:52px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;">但如果你在做</div>
+            <div id="sc24-tags" style="display:flex;flex-wrap:wrap;gap:16px;margin:24px 0;">
+              <div id="sc24-tag1" style="background:rgba(255,59,92,0.1);border:2px solid rgba(255,59,92,0.3);border-radius:10px;padding:12px 24px;font-size:36px;font-weight:700;color:#ff3b5c;">企业知识库</div>
+              <div id="sc24-tag2" style="background:rgba(255,59,92,0.1);border:2px solid rgba(255,59,92,0.3);border-radius:10px;padding:12px 24px;font-size:36px;font-weight:700;color:#ff3b5c;">复杂文档分析</div>
+            </div>
+            <div id="sc24-text2" style="font-size:52px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;">还在用传统<span class="hl-red">RAG</span>，</div>
+            <div id="sc24-divider" class="divider-red" style="width:100%;margin-top:40px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 25: 81.77-83.885s — 你就是在用锤子拧螺丝 -->
+      <!-- ============================================================ -->
+      <div id="sc25" class="scene clip" data-start="81.77" data-duration="2.115" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,92,0.2) 0%,transparent 70%);top:400px;left:140px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc25-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#ff3b5c;letter-spacing:0.08em;padding-top:20px;">// 判断</div>
+          <div>
+            <div id="sc25-text" style="font-size:72px;font-weight:900;color:#ffffff;line-height:1.2;letter-spacing:-0.02em;">你就是在用</div>
+            <div id="sc25-text2" style="font-size:80px;font-weight:900;color:#ff3b5c;line-height:1.1;letter-spacing:-0.03em;margin-top:8px;">锤子拧螺丝。</div>
+            <div id="sc25-divider" class="divider-red" style="width:100%;margin-top:44px;"></div>
+          </div>
+          <div></div>
+        </div>
+        <!-- Tools image -->
+        <div id="sc25-img-wrap" style="position:absolute;bottom:160px;right:60px;width:260px;height:260px;border-radius:16px;overflow:hidden;opacity:0.3;">
+          <img src="assets/media/pixabay-172502.jpg" style="width:100%;height:100%;object-fit:cover;" data-layout-ignore/>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 26: 83.885-86.718s — 最后给你一个判断标准，收藏备用 -->
+      <!-- ============================================================ -->
+      <div id="sc26" class="scene clip" data-start="83.885" data-duration="2.833" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 70%);top:200px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc26-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 收藏</div>
+          <div>
+            <div id="sc26-label" style="font-family:'JetBrains Mono',monospace;font-size:26px;color:#00d4ff;letter-spacing:0.1em;margin-bottom:28px;">SAVE THIS</div>
+            <div id="sc26-text" style="font-size:64px;font-weight:700;color:#ffffff;line-height:1.3;letter-spacing:-0.02em;">最后给你一个<br><span class="hl-blue">判断标准</span>，</div>
+            <div id="sc26-text2" style="font-size:56px;font-weight:600;color:#8899aa;line-height:1.4;letter-spacing:-0.01em;margin-top:16px;">收藏备用：</div>
+            <div id="sc26-divider" class="divider" style="width:100%;margin-top:44px;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 27: 86.718-89.749s — 问题简单、文档短——用RAG，够了 -->
+      <!-- ============================================================ -->
+      <div id="sc27" class="scene clip" data-start="86.718" data-duration="3.030" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(30,144,255,0.12) 0%,transparent 70%);bottom:200px;left:100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc27-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#8899aa;letter-spacing:0.08em;padding-top:20px;">// 规则 01</div>
+          <div>
+            <div id="sc27-rule" class="card" style="margin-bottom:24px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#1e90ff;margin-bottom:16px;">WHEN TO USE RAG</div>
+              <div style="font-size:44px;font-weight:700;color:#ffffff;line-height:1.4;">问题简单<br>文档短</div>
+              <div style="height:2px;background:rgba(0,212,255,0.3);margin:20px 0;"></div>
+              <div style="font-size:56px;font-weight:900;color:#00d4ff;line-height:1.2;">用 RAG，够了。</div>
+            </div>
+            <div id="sc27-divider" class="divider" style="width:100%;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 28: 89.749-93.395s — 问题复杂、文档有大量关联关系——上GraphRAG -->
+      <!-- ============================================================ -->
+      <div id="sc28" class="scene clip" data-start="89.749" data-duration="3.646" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 70%);top:200px;right:-100px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc28-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 规则 02</div>
+          <div>
+            <div id="sc28-rule" class="card" style="margin-bottom:24px;border-color:rgba(0,212,255,0.5);">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;margin-bottom:16px;">WHEN TO USE GRAPHRAG</div>
+              <div style="font-size:44px;font-weight:700;color:#ffffff;line-height:1.4;">问题复杂<br>文档有大量关联关系</div>
+              <div style="height:2px;background:rgba(0,212,255,0.4);margin:20px 0;"></div>
+              <div style="font-size:56px;font-weight:900;color:#00d4ff;line-height:1.2;">上 GraphRAG。</div>
+            </div>
+            <div id="sc28-divider" class="divider" style="width:100%;"></div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 29: 93.395-97.218s — 就这一句话，帮你省掉80%的选型时间 -->
+      <!-- ============================================================ -->
+      <div id="sc29" class="scene clip" data-start="93.395" data-duration="3.823" data-track-index="1" style="z-index:2;opacity:0;">
+        <div style="position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.18) 0%,transparent 70%);top:300px;left:90px;"></div>
+        <div style="position:absolute;top:0;left:0;width:1080px;height:1920px;display:grid;grid-template-rows:1fr auto 1fr;padding:192px 108px;">
+          <div id="sc29-tag" style="align-self:start;font-family:'JetBrains Mono',monospace;font-size:22px;color:#00d4ff;letter-spacing:0.08em;padding-top:20px;">// 收藏</div>
+          <div>
+            <div id="sc29-text" style="font-size:56px;font-weight:600;color:#ffffff;line-height:1.5;letter-spacing:-0.01em;">就这一句话，</div>
+            <div id="sc29-stat" style="font-size:120px;font-weight:900;color:#00d4ff;line-height:1.0;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;margin:16px 0;">80%</div>
+            <div id="sc29-text2" style="font-size:52px;font-weight:600;color:#ffffff;line-height:1.4;letter-spacing:-0.01em;">帮你省掉的<br>选型时间。</div>
+            <div id="sc29-divider" class="divider" style="width:100%;margin-top:40px;"></div>
+            <!-- Save icon hint -->
+            <div id="sc29-save" style="display:flex;align-items:center;gap:16px;margin-top:32px;">
+              <div style="font-size:40px;">🔖</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;color:#8899aa;">收藏这条规则</div>
+            </div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+    </div><!-- end #root -->
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ── COVER (sc0): 0-3s ──────────────────────────────────────────
+      tl.fromTo("#sc0-glow1", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.2, ease: "power2.out" }, 0.1);
+      tl.fromTo("#sc0-glow2", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.0, ease: "power2.out" }, 0.3);
+      tl.fromTo("#sc0-graph", { opacity: 0 }, { opacity: 0.1, duration: 1.5, ease: "power1.out" }, 0.2);
+      tl.fromTo("#sc0-ms", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, ease: "expo.out" }, 0.3);
+      tl.fromTo("#sc0-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, ease: "expo.out" }, 0.4);
+      tl.fromTo("#sc0-eyebrow", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.5);
+      tl.fromTo("#sc0-title1", { opacity: 0, y: 40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 0.6);
+      tl.fromTo("#sc0-title2", { opacity: 0, y: 40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 0.75);
+      tl.fromTo("#sc0-title3", { opacity: 0, y: 40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 0.9);
+      tl.fromTo("#sc0-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power2.out" }, 1.1);
+      tl.fromTo("#sc0-sub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 1.3);
+      tl.fromTo("#sc0-bar", { scaleX: 0 }, { scaleX: 1, duration: 1.0, ease: "power2.out" }, 1.5);
+      // Ambient pulse on glow
+      tl.to("#sc0-glow1", { scale: 1.08, duration: 1.2, yoyo: true, repeat: 1, ease: "sine.inOut" }, 1.0);
+
+      // Cover exit (crossfade into sc1)
+      tl.to("#sc0", { opacity: 0, duration: 0.4, ease: "power2.in" }, 2.7);
+
+      // ── SCENE 1 (sc1): 3.1-6.175s ─────────────────────────────────
+      tl.fromTo("#sc1", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 3.1);
+      tl.fromTo("#sc1-tag", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 3.2);
+      tl.fromTo("#sc1-num", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 3.25);
+      tl.fromTo("#sc1-text", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.35);
+      tl.fromTo("#sc1-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 3.7);
+      tl.fromTo("#sc1-bottom", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 3.8);
+      tl.fromTo("#sc1-deco", { opacity: 0, rotation: -20 }, { opacity: 1, rotation: -15, duration: 0.8, ease: "power2.out" }, 3.3);
+      // Transition to sc2: blur crossfade
+      tl.to("#sc1", { opacity: 0, filter: "blur(8px)", duration: 0.3, ease: "power2.in" }, 5.9);
+
+      // ── SCENE 2 (sc2): 6.125-9.552s ───────────────────────────────
+      tl.fromTo("#sc2", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 6.125);
+      tl.fromTo("#sc2-tag", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 6.2);
+      tl.fromTo("#sc2-label", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 6.25);
+      tl.fromTo("#sc2-text", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 6.35);
+      tl.fromTo("#sc2-text2", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 6.55);
+      tl.fromTo("#sc2-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 6.9);
+      tl.fromTo("#sc2-sub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 7.1);
+      tl.fromTo("#sc2-deco", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 6.3);
+      // Transition: velocity push up
+      tl.to("#sc2", { opacity: 0, y: -60, filter: "blur(12px)", duration: 0.35, ease: "power2.in" }, 9.2);
+
+      // ── SCENE 3 (sc3): 9.552-11.208s ──────────────────────────────
+      tl.fromTo("#sc3", { opacity: 0, y: 60, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 9.552);
+      tl.fromTo("#sc3-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 9.65);
+      tl.fromTo("#sc3-text", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 9.7);
+      tl.fromTo("#sc3-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, 10.1);
+      tl.fromTo("#sc3-deco", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 9.6);
+      // Transition: hard cut
+      tl.to("#sc3", { opacity: 0, duration: 0.25, ease: "power2.in" }, 11.0);
+
+      // ── SCENE 4 (sc4): 11.208-14.968s ─────────────────────────────
+      tl.fromTo("#sc4", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 11.208);
+      tl.fromTo("#sc4-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 11.3);
+      tl.fromTo("#sc4-bubble-q", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 11.4);
+      tl.fromTo("#sc4-bubble-a", { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.4)" }, 11.7);
+      tl.fromTo("#sc4-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 12.1);
+      tl.fromTo("#sc4-img-wrap", { opacity: 0, scale: 0.9 }, { opacity: 0.35, scale: 1, duration: 0.6, ease: "power2.out" }, 11.5);
+      // Transition: blur crossfade
+      tl.to("#sc4", { opacity: 0, filter: "blur(8px)", duration: 0.3, ease: "power2.in" }, 14.7);
+
+      // ── SCENE 5 (sc5): 15.041-18.114s ─────────────────────────────
+      tl.fromTo("#sc5", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 15.041);
+      tl.fromTo("#sc5-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 15.15);
+      tl.fromTo("#sc5-bubble-q", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 15.2);
+      tl.fromTo("#sc5-bubble-a", { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.4)" }, 15.5);
+      tl.fromTo("#sc5-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 15.9);
+      tl.fromTo("#sc5-deco", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out" }, 15.3);
+      // Transition: velocity push up
+      tl.to("#sc5", { opacity: 0, y: -50, duration: 0.3, ease: "power2.in" }, 17.8);
+
+      // ── SCENE 6 (sc6): 18.041-19.916s ─────────────────────────────
+      tl.fromTo("#sc6", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 18.041);
+      tl.fromTo("#sc6-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 18.15);
+      tl.fromTo("#sc6-text", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 18.2);
+      tl.fromTo("#sc6-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, 18.6);
+      tl.fromTo("#sc6-deco", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 18.15);
+      // Transition: hard cut
+      tl.to("#sc6", { opacity: 0, duration: 0.25, ease: "power2.in" }, 19.7);
+
+      // ── SCENE 7 (sc7): 19.916-24.114s ─────────────────────────────
+      tl.fromTo("#sc7", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 19.916);
+      tl.fromTo("#sc7-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 20.05);
+      tl.fromTo("#sc7-label", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 20.1);
+      tl.fromTo("#sc7-text", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 20.2);
+      tl.fromTo("#sc7-text2", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 20.45);
+      tl.fromTo("#sc7-text3", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 20.7);
+      tl.fromTo("#sc7-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power2.out" }, 21.1);
+      // Transition: blur crossfade
+      tl.to("#sc7", { opacity: 0, filter: "blur(8px)", duration: 0.35, ease: "power2.in" }, 23.8);
+
+      // ── SCENE 8 (sc8): 24.114-26.26s ──────────────────────────────
+      tl.fromTo("#sc8", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 24.114);
+      tl.fromTo("#sc8-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 24.25);
+      tl.fromTo("#sc8-label", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 24.3);
+      tl.fromTo("#sc8-text", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 24.4);
+      tl.fromTo("#sc8-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 24.8);
+      tl.fromTo("#sc8-deco", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out" }, 24.3);
+      // Transition: velocity push
+      tl.to("#sc8", { opacity: 0, y: -40, duration: 0.3, ease: "power2.in" }, 26.0);
+
+      // ── SCENE 9 (sc9): 26.26-31.197s ──────────────────────────────
+      tl.fromTo("#sc9", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 26.26);
+      tl.fromTo("#sc9-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 26.4);
+      tl.fromTo("#sc9-step1", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 26.5);
+      tl.fromTo("#sc9-step2", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 26.8);
+      tl.fromTo("#sc9-step3", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 27.1);
+      tl.fromTo("#sc9-step4", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 27.4);
+      tl.fromTo("#sc9-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power2.out" }, 27.8);
+      // Transition: blur crossfade
+      tl.to("#sc9", { opacity: 0, filter: "blur(8px)", duration: 0.3, ease: "power2.in" }, 30.9);
+
+      // ── SCENE 10 (sc10): 31.197-32.822s ───────────────────────────
+      tl.fromTo("#sc10", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out" }, 31.197);
+      tl.fromTo("#sc10-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 31.3);
+      tl.fromTo("#sc10-text", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 31.35);
+      tl.fromTo("#sc10-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, 31.7);
+      tl.fromTo("#sc10-deco", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 31.3);
+      // Transition: hard cut
+      tl.to("#sc10", { opacity: 0, duration: 0.2, ease: "power3.in" }, 32.65);
+
+      // ── SCENE 11 (sc11): 32.822-36.291s ───────────────────────────
+      tl.fromTo("#sc11", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 32.822);
+      tl.fromTo("#sc11-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 32.95);
+      tl.fromTo("#sc11-label", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 33.0);
+      tl.fromTo("#sc11-text", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 33.1);
+      tl.fromTo("#sc11-bad", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 33.4);
+      tl.fromTo("#sc11-good", { opacity: 0, x: 30 }, { opacity: 0.4, x: 0, duration: 0.45, ease: "power3.out" }, 33.6);
+      tl.fromTo("#sc11-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 34.0);
+      tl.fromTo("#sc11-img-wrap", { opacity: 0, scale: 0.9 }, { opacity: 0.25, scale: 1, duration: 0.6, ease: "power2.out" }, 33.2);
+      // Transition: velocity push up
+      tl.to("#sc11", { opacity: 0, y: -50, filter: "blur(10px)", duration: 0.35, ease: "power2.in" }, 36.0);
+
+      // ── SCENE 12 (sc12): 36.291-40.406s ───────────────────────────
+      tl.fromTo("#sc12", { opacity: 0, y: 50, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 36.291);
+      tl.fromTo("#sc12-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 36.4);
+      tl.fromTo("#sc12-label", { opacity: 0, y: -15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 36.45);
+      tl.fromTo("#sc12-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 36.55);
+      tl.fromTo("#sc12-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 36.75);
+      tl.fromTo("#sc12-text3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 36.95);
+      tl.fromTo("#sc12-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 37.3);
+      tl.fromTo("#sc12-frames", { opacity: 0, x: 30 }, { opacity: 0.3, x: 0, duration: 0.6, ease: "power2.out" }, 36.5);
+      // Transition: blur crossfade
+      tl.to("#sc12", { opacity: 0, filter: "blur(8px)", duration: 0.3, ease: "power2.in" }, 40.1);
+      tl.set("#sc12", { opacity: 0 }, 40.406);
+
+      // ── SCENE 13 (sc13): 40.406-41.864s ───────────────────────────
+      tl.fromTo("#sc13", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out" }, 40.406);
+      tl.fromTo("#sc13-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 40.5);
+      tl.fromTo("#sc13-text", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 40.55);
+      tl.fromTo("#sc13-deco", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }, 40.5);
+      // Transition: hard cut
+      tl.to("#sc13", { opacity: 0, duration: 0.15, ease: "power3.in" }, 41.75);
+
+      // ── SCENE 14 (sc14): 41.864-42.76s ────────────────────────────
+      tl.fromTo("#sc14", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power3.out" }, 41.864);
+      tl.fromTo("#sc14-text", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 41.9);
+      // Transition: hard cut
+      tl.to("#sc14", { opacity: 0, duration: 0.15, ease: "power3.in" }, 42.65);
+
+      // ── SCENE 15 (sc15): 42.76-46.197s ────────────────────────────
+      tl.fromTo("#sc15", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 42.76);
+      tl.fromTo("#sc15-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 42.9);
+      tl.fromTo("#sc15-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 42.95);
+      tl.fromTo("#sc15-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 43.15);
+      tl.fromTo("#sc15-text3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 43.35);
+      tl.fromTo("#sc15-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 43.7);
+      // Transition: zoom through into GraphRAG section
+      tl.to("#sc15", { opacity: 0, scale: 1.08, filter: "blur(12px)", duration: 0.4, ease: "power2.in" }, 45.8);
+
+      // ── SCENE 16 (sc16): 46.197-49.249s ───────────────────────────
+      tl.fromTo("#sc16", { opacity: 0, scale: 0.92, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 46.197);
+      tl.fromTo("#sc16-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 46.35);
+      tl.fromTo("#sc16-ms", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 46.4);
+      tl.fromTo("#sc16-title", { opacity: 0, y: 40, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 46.5);
+      tl.fromTo("#sc16-sub", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 46.9);
+      tl.fromTo("#sc16-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power2.out" }, 47.3);
+      tl.fromTo("#sc16-img-wrap", { opacity: 0, scale: 0.9 }, { opacity: 0.3, scale: 1, duration: 0.7, ease: "power2.out" }, 46.6);
+      // Ambient: title pulse
+      tl.to("#sc16-title", { scale: 1.02, duration: 0.8, yoyo: true, repeat: 1, ease: "sine.inOut" }, 47.2);
+      // Transition: velocity push up
+      tl.to("#sc16", { opacity: 0, y: -50, duration: 0.35, ease: "power2.in" }, 48.9);
+
+      // ── SCENE 17 (sc17): 49.249-52.947s ───────────────────────────
+      tl.fromTo("#sc17", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 49.249);
+      tl.fromTo("#sc17-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 49.4);
+      tl.fromTo("#sc17-old", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 49.5);
+      tl.fromTo("#sc17-new", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 49.8);
+      tl.fromTo("#sc17-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 50.2);
+      // Transition: blur crossfade
+      tl.to("#sc17", { opacity: 0, filter: "blur(8px)", duration: 0.35, ease: "power2.in" }, 52.6);
+
+      // ── SCENE 18 (sc18): 52.947-58.489s ───────────────────────────
+      tl.fromTo("#sc18", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 52.947);
+      tl.fromTo("#sc18-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 53.1);
+      // Graph nodes appear staggered
+      tl.fromTo("#sc18-n1", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 53.2);
+      tl.fromTo("#sc18-n2", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 53.5);
+      tl.fromTo("#sc18-n3", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 53.8);
+      // Edges draw
+      tl.fromTo("#sc18-e1", { opacity: 0, strokeDasharray: "200", strokeDashoffset: "200" }, { opacity: 0.6, strokeDashoffset: "0", duration: 0.5, ease: "power2.out" }, 53.7);
+      tl.fromTo("#sc18-e2", { opacity: 0, strokeDasharray: "424", strokeDashoffset: "424" }, { opacity: 0.6, strokeDashoffset: "0", duration: 0.5, ease: "power2.out" }, 54.0);
+      tl.fromTo("#sc18-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 54.3);
+      tl.fromTo("#sc18-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 54.7);
+      tl.fromTo("#sc18-img-wrap", { opacity: 0, scale: 0.9 }, { opacity: 0.2, scale: 1, duration: 0.7, ease: "power2.out" }, 53.3);
+      // Ambient: graph pulse
+      tl.to("#sc18-n1", { scale: 1.15, duration: 0.8, yoyo: true, repeat: 2, ease: "sine.inOut" }, 54.5);
+      // Transition: velocity push
+      tl.to("#sc18", { opacity: 0, y: -50, filter: "blur(10px)", duration: 0.35, ease: "power2.in" }, 58.15);
+
+      // ── SCENE 19 (sc19): 58.489-61.479s ───────────────────────────
+      tl.fromTo("#sc19", { opacity: 0, y: 50, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 58.489);
+      tl.fromTo("#sc19-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 58.6);
+      tl.fromTo("#sc19-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 58.7);
+      tl.fromTo("#sc19-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 58.9);
+      tl.fromTo("#sc19-text3", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 59.1);
+      tl.fromTo("#sc19-text4", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 59.4);
+      tl.fromTo("#sc19-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 59.7);
+      // Transition: blur crossfade
+      tl.to("#sc19", { opacity: 0, filter: "blur(8px)", duration: 0.35, ease: "power2.in" }, 61.15);
+
+      // ── SCENE 20 (sc20): 61.479-67.302s ───────────────────────────
+      tl.fromTo("#sc20", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 61.479);
+      tl.fromTo("#sc20-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 61.6);
+      tl.fromTo("#sc20-old", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 61.7);
+      tl.fromTo("#sc20-new", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 62.1);
+      tl.fromTo("#sc20-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 62.5);
+      // Transition: velocity push
+      tl.to("#sc20", { opacity: 0, y: -50, duration: 0.35, ease: "power2.in" }, 67.0);
+
+      // ── SCENE 21 (sc21): 67.302-70.656s ───────────────────────────
+      tl.fromTo("#sc21", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 67.302);
+      tl.fromTo("#sc21-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 67.45);
+      tl.fromTo("#sc21-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 67.5);
+      tl.fromTo("#sc21-text2", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.4)" }, 67.8);
+      tl.fromTo("#sc21-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 68.2);
+      // Transition: blur crossfade into debate section
+      tl.to("#sc21", { opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power2.in" }, 70.3);
+
+      // ── SCENE 22 (sc22): 70.656-74.406s ───────────────────────────
+      tl.fromTo("#sc22", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 70.656);
+      tl.fromTo("#sc22-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 70.8);
+      tl.fromTo("#sc22-label", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 70.85);
+      tl.fromTo("#sc22-quote", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 70.95);
+      tl.fromTo("#sc22-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 71.4);
+      // Transition: velocity push
+      tl.to("#sc22", { opacity: 0, y: -40, duration: 0.3, ease: "power2.in" }, 74.1);
+
+      // ── SCENE 23 (sc23): 74.406-77.239s ───────────────────────────
+      tl.fromTo("#sc23", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 74.406);
+      tl.fromTo("#sc23-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 74.5);
+      tl.fromTo("#sc23-text", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 74.55);
+      tl.fromTo("#sc23-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 74.8);
+      tl.fromTo("#sc23-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, 75.2);
+      // Transition: hard cut
+      tl.to("#sc23", { opacity: 0, duration: 0.25, ease: "power2.in" }, 77.0);
+
+      // ── SCENE 24 (sc24): 77.239-81.77s ────────────────────────────
+      tl.fromTo("#sc24", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 77.239);
+      tl.fromTo("#sc24-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 77.35);
+      tl.fromTo("#sc24-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 77.4);
+      tl.fromTo("#sc24-tag1", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 77.7);
+      tl.fromTo("#sc24-tag2", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 77.95);
+      tl.fromTo("#sc24-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 78.2);
+      tl.fromTo("#sc24-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 78.6);
+      // Transition: velocity push
+      tl.to("#sc24", { opacity: 0, y: -50, filter: "blur(8px)", duration: 0.35, ease: "power2.in" }, 81.45);
+
+      // ── SCENE 25 (sc25): 81.77-83.885s ────────────────────────────
+      tl.fromTo("#sc25", { opacity: 0, y: 50, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 81.77);
+      tl.fromTo("#sc25-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 81.9);
+      tl.fromTo("#sc25-text", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 81.95);
+      tl.fromTo("#sc25-text2", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.4)" }, 82.2);
+      tl.fromTo("#sc25-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, 82.6);
+      tl.fromTo("#sc25-img-wrap", { opacity: 0, scale: 0.9 }, { opacity: 0.3, scale: 1, duration: 0.6, ease: "power2.out" }, 82.0);
+      // Transition: blur crossfade into conclusion
+      tl.to("#sc25", { opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power2.in" }, 83.5);
+
+      // ── SCENE 26 (sc26): 83.885-86.718s ───────────────────────────
+      tl.fromTo("#sc26", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 83.885);
+      tl.fromTo("#sc26-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 84.0);
+      tl.fromTo("#sc26-label", { opacity: 0, y: -15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 84.05);
+      tl.fromTo("#sc26-text", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 84.15);
+      tl.fromTo("#sc26-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 84.5);
+      tl.fromTo("#sc26-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 84.8);
+      // Transition: velocity push
+      tl.to("#sc26", { opacity: 0, y: -40, duration: 0.3, ease: "power2.in" }, 86.45);
+
+      // ── SCENE 27 (sc27): 86.718-89.749s ───────────────────────────
+      tl.fromTo("#sc27", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 86.718);
+      tl.fromTo("#sc27-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 86.85);
+      tl.fromTo("#sc27-rule", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 86.9);
+      tl.fromTo("#sc27-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 87.3);
+      // Transition: blur crossfade
+      tl.to("#sc27", { opacity: 0, filter: "blur(8px)", duration: 0.3, ease: "power2.in" }, 89.5);
+
+      // ── SCENE 28 (sc28): 89.749-93.395s ───────────────────────────
+      tl.fromTo("#sc28", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 89.749);
+      tl.fromTo("#sc28-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 89.9);
+      tl.fromTo("#sc28-rule", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 89.95);
+      tl.fromTo("#sc28-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 90.4);
+      // Transition: velocity push
+      tl.to("#sc28", { opacity: 0, y: -40, duration: 0.35, ease: "power2.in" }, 93.1);
+
+      // ── SCENE 29 (sc29): 93.395-97.218s — FINAL ───────────────────
+      tl.fromTo("#sc29", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 93.395);
+      tl.fromTo("#sc29-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 93.55);
+      tl.fromTo("#sc29-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 93.6);
+      tl.fromTo("#sc29-stat", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.4)" }, 93.85);
+      tl.fromTo("#sc29-text2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 94.3);
+      tl.fromTo("#sc29-divider", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 94.7);
+      tl.fromTo("#sc29-save", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 95.0);
+      // Ambient: stat pulse
+      tl.to("#sc29-stat", { scale: 1.04, duration: 0.8, yoyo: true, repeat: 1, ease: "sine.inOut" }, 94.5);
+      // Final fade out
+      tl.to("#sc29", { opacity: 0, duration: 0.6, ease: "power2.in" }, 96.6);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
